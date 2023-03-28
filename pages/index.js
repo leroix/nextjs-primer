@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Index() {
   // STEP 1
@@ -13,6 +13,10 @@ export default function Index() {
   const [conversationId, setConversationId] = useState(null)
 
   const [token, setToken] = useState(null)
+
+  useEffect(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [messages])
 
   // STEP 2
   // Define a generic method to handle any errors.
@@ -126,24 +130,96 @@ export default function Index() {
       <Head>
         <title>ChatBotKit Next.js Primer</title>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Montserrat"></link>
       </Head>
       <main>
         {/* messages */}
-        <div>
+        <div
+          style={{
+            overflow: "scroll",
+            height: "100%",
+            marginBottom: 150
+          }}>
           {
             messages.map(({ id, type, text }) => {
               return (
-                <div key={id}>
-                  <div>{{ user: '🧠', bot: '🤖' }[type]}</div>
-                  <div>{text}</div>
+                <div
+                  style={{
+                    display: "flex",
+                    padding: "20px 20px",
+                    backgroundColor: type === "user" ? "none" : "#f2f8fa"
+                  }}
+                  key={id}
+                  >
+                  <div
+                    style={{
+                      marginRight: 20,
+                    }}
+                    >
+                    <img
+                      width="30"
+                      height="30"
+                      src={type === "user" ? "/usericon.png" : "/openorgicon.png"}
+                      />
+                  </div>
+                  <div>
+                    {text}
+                  </div>
                 </div>
               )
             })
           }
         </div>
-        {/* input */}
-        <textarea style={{width: '500px', height: '50px'}} value={text} onChange={() => setText(event.target.value)} onKeyDown={handleOnKeyDown} placeholder="Say something..."/>
       </main>
+      {/* input */}
+      <div
+        style={{
+          position: "fixed",
+          zIndex: 1,
+          bottom: 0,
+          width: "100%"
+        }}
+        >
+        <div
+          style={{
+            position: "relative",
+            margin: "20px 40px",
+            border: "1px solid #c2c0c0",
+            borderRadius: "10px",
+            padding: "20px 60px 20px 20px",
+            backgroundColor: "white"
+          }}
+          >
+          <textarea
+            style={{
+              width: '100%',
+              minHeight: 24,
+              resize: "none",
+              border: "0 solid black",
+              outline: "none",
+              overflow: "auto"
+            }}
+            value={text}
+            onChange={() => setText(event.target.value)}
+            onKeyDown={handleOnKeyDown}
+            placeholder="Tell us your thoughts..."
+            />
+          <button
+            style={{
+              position: "absolute",
+              bottom: 8,
+              right: 8,
+              cursor: "pointer",
+              width: 40,
+              height: 40,
+              padding: "12px 10px 10px 10px"
+            }}
+            >
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
     </>
   )
 }

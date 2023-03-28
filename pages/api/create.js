@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         },
 
         body: JSON.stringify({
-            backstory: 'This is a friendly chat bot.'
+            backstory: 'I am a researcher seeking to better understand the issues facing your organization. You will provide me with feedback that your organization needs to hear to improve, and I will respond with clarifying questions three times. Afterwards, I will ask you for email addresses of your colleagues that would like to give feedback on the company.',
         })
     })
 
