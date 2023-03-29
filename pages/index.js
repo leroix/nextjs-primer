@@ -1,18 +1,39 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 
+function getUrlQueryParam(name) {
+  const queryString = window.location.search
+  const urlParams = new URLSearchParams(queryString)
+  return urlParams.get(name)
+}
+
+function prependConversationMetadata(message) {
+  return `{"company": "${getUrlQueryParam("company") || ""}", "campaign": "${getUrlQueryParam("campaign") || ""}"}
+${message}`
+}
+
 export default function Index() {
   // STEP 1
   // Setup state to track send and received messages, the text input and the
   // conversation id and token.
 
-  const [messages, setMessages] = useState([])
+  const defaultMessages = [
+    {
+      id: "greeting",
+      text: "Hi! As an employee, do you have any feedback your managers should hear?",
+      type: "bot"
+    }
+  ]
+
+  const [messages, setMessages] = useState(defaultMessages)
 
   const [text, setText] = useState('')
 
   const [conversationId, setConversationId] = useState(null)
 
   const [token, setToken] = useState(null)
+
+  const [isResponseInProgress, setIsResponseInProgress] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, document.body.scrollHeight);
@@ -22,7 +43,12 @@ export default function Index() {
   // Define a generic method to handle any errors.
 
   function handleError(err) {
+    setIsResponseInProgress(false)
     console.error(err)
+  }
+
+  function isFirstSend() {
+    return messages.length === 1
   }
 
   // STEP 3
@@ -33,10 +59,6 @@ export default function Index() {
   // pages/api/create.js for more information.
 
   async function continueConversation(cid = conversationId, tkn = token) {
-    // set the text input to empty string
-
-    setText('')
-
     // get hold of a new instances of messages in order to update the state
 
     let newMessages = messages.slice(0)
@@ -47,12 +69,12 @@ export default function Index() {
       method: 'POST',
 
       headers: {
-          'Authorization': `Bearer ${tkn}`,
-          'Content-Type': 'application/json'
+        'Authorization': `Bearer ${tkn}`,
+        'Content-Type': 'application/json'
       },
 
       body: JSON.stringify({
-        text
+        text: isFirstSend() ? prependConversationMetadata(text) : text
       })
     })
 
@@ -64,9 +86,6 @@ export default function Index() {
 
     const { id: sendMessageId } = await response01.json()
 
-    newMessages = newMessages.concat([{ id: sendMessageId, text: text, type: 'user' }])
-
-    setMessages(newMessages)
 
     // Sub-step B: receive a message from the conversation instance
 
@@ -88,10 +107,25 @@ export default function Index() {
     }
 
     const { id: receiveMessageId, text: receiveText } = await response02.json()
+    
+    const savedUserMessage = {
+      id: sendMessageId,
+      text,
+      type: "user"
+    }
 
-    newMessages = newMessages.concat([{ id: receiveMessageId, text: receiveText, type: 'bot' }])
+    const botResponse = {
+      id: receiveMessageId,
+      text: receiveText,
+      type: "bot"
+    }
 
-    setMessages(newMessages)
+    setMessages(newMessages.concat([
+      savedUserMessage,
+      botResponse
+    ]))
+
+    setIsResponseInProgress(false)
   }
 
   async function startConversation() {
@@ -111,27 +145,53 @@ export default function Index() {
     continueConversation(conversationId, token)
   }
 
+  function handleSend() {
+    if (isResponseInProgress) {
+      return
+    }
+
+    setText("")
+    setIsResponseInProgress(true)
+
+    const unsavedUserMessage = {
+      id: "temporaryId",
+      text,
+      type: "user"
+    }
+
+    const unsavedBotMessage = {
+      id: "temporaryBotId",
+      text: "OpenOrg is typing...",
+      type: "bot"
+    }
+
+    setMessages(messages.concat([
+      unsavedUserMessage,
+      unsavedBotMessage
+    ]))
+
+    if (conversationId) {
+      continueConversation()
+    } else {
+      startConversation()
+    }
+  }
+
   function handleOnKeyDown(event) {
     // ENTER KEY
 
     if (event.keyCode === 13) {
       event.preventDefault()
 
-      if (conversationId) {
-        continueConversation()
-      } else {
-        startConversation()
-      }
+      handleSend()
     }
   }
 
   return (
     <>
       <Head>
-        <title>ChatBotKit Next.js Primer</title>
+        <title>OpenOrg Chatbot</title>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Montserrat"></link>
       </Head>
       <main>
         {/* messages */}
@@ -171,55 +231,60 @@ export default function Index() {
             })
           }
         </div>
-      </main>
-      {/* input */}
-      <div
-        style={{
-          position: "fixed",
-          zIndex: 1,
-          bottom: 0,
-          width: "100%"
-        }}
-        >
+        {/* input */}
         <div
           style={{
-            position: "relative",
-            margin: "20px 40px",
-            border: "1px solid #c2c0c0",
-            borderRadius: "10px",
-            padding: "20px 60px 20px 20px",
-            backgroundColor: "white"
+            position: "fixed",
+            zIndex: 1,
+            bottom: 0,
+            width: "100%"
           }}
           >
-          <textarea
+          <div
             style={{
-              width: '100%',
-              minHeight: 24,
-              resize: "none",
-              border: "0 solid black",
-              outline: "none",
-              overflow: "auto"
-            }}
-            value={text}
-            onChange={() => setText(event.target.value)}
-            onKeyDown={handleOnKeyDown}
-            placeholder="Tell us your thoughts..."
-            />
-          <button
-            style={{
-              position: "absolute",
-              bottom: 8,
-              right: 8,
-              cursor: "pointer",
-              width: 40,
-              height: 40,
-              padding: "12px 10px 10px 10px"
+              position: "relative",
+              margin: "20px 40px",
+              border: "1px solid #c2c0c0",
+              borderRadius: "10px",
+              padding: "20px 60px 20px 20px",
+              backgroundColor: "white"
             }}
             >
-            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-          </button>
+            <textarea
+              style={{
+                width: '100%',
+                minHeight: 24,
+                resize: "none",
+                border: "0 solid black",
+                outline: "none",
+                overflow: "auto"
+              }}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={handleOnKeyDown}
+              placeholder="Tell us your thoughts..."
+              />
+            <button
+              style={{
+                position: "absolute",
+                bottom: 8,
+                right: 8,
+                cursor: "pointer",
+                width: 40,
+                height: 40,
+                padding: "12px 10px 10px 10px"
+              }}
+              onClick={handleSend}
+              >
+              {
+                isResponseInProgress ?
+                "..." :
+                <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 mr-1" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              }
+            </button>
+          </div>
         </div>
-      </div>
+      </main>
     </>
   )
 }
