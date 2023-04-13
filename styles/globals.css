@@ -1,6 +1,7 @@
 html > body {
     font-family: Montserrat;
     font-size: 20px;
+	line-height: 1.75rem;
 }
 
 textarea {
