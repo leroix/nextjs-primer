@@ -1,15 +1,16 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 
-function getUrlQueryParam(name) {
-  const queryString = window.location.search
-  const urlParams = new URLSearchParams(queryString)
-  return urlParams.get(name)
-}
+// function getUrlQueryParam(name) {
+//   const queryString = window.location.search
+//   const urlParams = new URLSearchParams(queryString)
+//   return urlParams.get(name)
+// }
 
 function prependConversationMetadata(message) {
-  return `{"company": "${getUrlQueryParam("company") || ""}", "campaign": "${getUrlQueryParam("campaign") || ""}"}
-${message}`
+//   return `{"company": "${getUrlQueryParam("company") || ""}", "campaign": "${getUrlQueryParam("campaign") || ""}"}
+// ${message}`
+  return message
 }
 
 export default function Index() {
@@ -20,7 +21,7 @@ export default function Index() {
   const defaultMessages = [
     {
       id: "greeting",
-      text: "Hello! I'm OpenOrg's AI chatbot, Rene. I'm here to learn about how Salesforce can improve. I will never store any personally identifiable information that could connect you to the feedback you provide. As an employee, do you have any feedback that your managers should hear?",
+      text: "Hello! I'm OpenOrg's AI chatbot, Rene. I'm here to learn how Salesforce can improve by collecting anonymous feedback. Do you have any feedback that your managers should hear?",
       type: "bot"
     }
   ]
