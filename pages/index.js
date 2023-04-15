@@ -162,7 +162,7 @@ export default function Index() {
 
     const unsavedBotMessage = {
       id: "temporaryBotId",
-      text: "OpenOrg is typing...",
+      text: "Rene is typing...",
       type: "bot"
     }
 
