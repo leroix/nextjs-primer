@@ -21,7 +21,7 @@ export default function Index() {
   const defaultMessages = [
     {
       id: "greeting",
-      text: "Hello! I'm OpenOrg's AI chatbot, Rene. I'm here to learn how Salesforce can improve by collecting anonymous feedback. Do you have any feedback that your managers should hear?",
+      text: "Hello! I'm OpenOrg's AI chatbot, Ren. I'm here to collect anonymous ideas, feedback and questions. Do you have ideas to help improve Salesforce?",
       type: "bot"
     }
   ]
@@ -162,7 +162,7 @@ export default function Index() {
 
     const unsavedBotMessage = {
       id: "temporaryBotId",
-      text: "Rene is typing...",
+      text: "Ren is typing...",
       type: "bot"
     }
 

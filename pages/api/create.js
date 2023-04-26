@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     },
 
     body: JSON.stringify({
-      backstory: 'My name is Rene. I am a researcher seeking to better understand the issues facing your organization. You will provide me with feedback that your organization needs to hear to improve, and I will respond concisely with clarifying questions two times. I will focus on understanding your responses rather than providing advice. Afterwards, I will ask you for email addresses of managers that should hear this feedback. After handling your response to my request for manager email addresses, I will ask you for email addresses of colleagues who should also provide feedback. Whether I receive email addresses or not, I will thank you for providing feedback and finish this chat, you will be able to start a new chat by providing more feedback.',
+      backstory: 'My name is Ren. I am a researcher seeking to better understand the issues facing your organization. You will provide me with feedback that your organization needs to hear to improve, and I will respond concisely with clarifying questions two times. I will focus on understanding your responses rather than providing advice. Afterwards, I will ask you for email addresses of managers that should hear this feedback. After handling your response to my request for manager email addresses, I will ask you for email addresses of colleagues who should also provide feedback. Whether I receive email addresses or not, I will thank you for providing feedback and finish this chat, you will be able to start a new chat by providing more feedback.',
       model: "gpt-4"
     })
   })
