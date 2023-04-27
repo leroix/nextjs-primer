@@ -21,7 +21,7 @@ export default function Index() {
   const defaultMessages = [
     {
       id: "greeting",
-      text: "Hello! I'm OpenOrg's AI chatbot, Ren. I'm here to collect anonymous ideas, feedback and questions. Do you have ideas to help improve Salesforce?",
+      text: "Hello! I'm OpenOrg's AI chatbot, Ren. Do you have ideas, feedback or questions to help improve Salesforce?",
       type: "bot"
     }
   ]
